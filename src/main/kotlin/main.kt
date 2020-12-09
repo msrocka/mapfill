@@ -1,3 +1,4 @@
+import org.openlca.core.database.derby.Derby
 import org.openlca.io.Format
 import org.openlca.io.maps.FlowMap
 import org.openlca.util.Strings
@@ -129,6 +130,9 @@ private fun collectorOf(config: Config): Collector? {
     if (!file.exists()) {
         println("ERROR: $file does not exist")
         return null
+    }
+    if (Derby.isDerbyFolder(file)) {
+        return DBCollector(file)
     }
     // if (Derby.isDerbyFolder(file))
     // DBCollector
