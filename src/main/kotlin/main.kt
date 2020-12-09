@@ -61,8 +61,6 @@ fun main(args: Array<String>) {
     Filler(mapping, side, collector).doIt()
 
 
-    val ilcd = "C:/Users/Win10/Projects/databases/_dumps/EF-v3.0.zip"
-    ILCDCollector(File(ilcd)).collect()
 }
 
 private fun printHelp() {
