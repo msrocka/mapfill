@@ -1,4 +1,8 @@
+import org.openlca.io.Format
+import org.openlca.io.maps.FlowMap
+import org.openlca.util.Strings
 import java.io.File
+import java.lang.Exception
 
 class Config {
     var mappingFile = ""
@@ -43,6 +47,19 @@ fun main(args: Array<String>) {
         }
     }
 
+    val side = sideOf(config)
+    val mapping = mappingOf(config)
+    val collector = collectorOf(config)
+    if (side == null || mapping == null || collector == null) {
+        println(
+            "ERROR: invalid arguments; " +
+                    "use `help` for more information"
+        )
+        return
+    }
+
+    Filler(mapping, side, collector).doIt()
+
 
     val ilcd = "C:/Users/Win10/Projects/databases/_dumps/EF-v3.0.zip"
     ILCDCollector(File(ilcd)).collect()
@@ -71,4 +88,56 @@ private fun printHelp() {
         `mapfill -h` or `mapfill help` will print this help
     """.trimIndent()
     )
+}
+
+private fun sideOf(config: Config): Side? {
+    val side = config.side.trim().toLowerCase()
+    return when {
+        side.startsWith("s") -> Side.Source
+        side.startsWith("t") -> Side.Target
+        else -> null
+    }
+}
+
+private fun mappingOf(config: Config): FlowMap? {
+    val path = config.mappingFile
+    if (Strings.nullOrEmpty(path))
+        return null
+    val file = File(path)
+    if (!file.exists()) {
+        println("ERROR: $file does not exist")
+        return null
+    }
+    return try {
+        FlowMap.fromCsv(file)
+    } catch (e: Exception) {
+        println("ERROR: failed to read mapping file: ${e.message}")
+        null
+    }
+}
+
+private fun collectorOf(config: Config): Collector? {
+    val path = config.source
+    if (Strings.nullOrEmpty(path))
+        return null
+    val file = File(path)
+    if (!file.exists()) {
+        println("ERROR: $file does not exist")
+        return null
+    }
+    // if (Derby.isDerbyFolder(file))
+    // DBCollector
+    val format = Format.detect(file).orElse(null)
+    if (format == null) {
+        println("ERROR: could not detect format of $file")
+        return null
+    }
+    return when (format) {
+        Format.ILCD_ZIP -> ILCDCollector(file)
+        else -> {
+            println("ERROR: format $format is not" +
+                    " implemented as data source")
+            null
+        }
+    }
 }

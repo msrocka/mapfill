@@ -15,9 +15,9 @@ import java.io.File
 /**
  * Collects elementary flow data from an ILCD package.
  */
-class ILCDCollector(private val zip: File) {
+class ILCDCollector(private val zip: File) : Collector {
 
-    fun collect(): Map<String, FlowRef> {
+    override fun collect(): Map<String, FlowRef> {
 
         val store = ZipStore(zip)
 
