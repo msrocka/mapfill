@@ -27,3 +27,7 @@ with:
 
 `mapfill -h` or `mapfill help` will print this help
 ```
+
+## Building from source
+`mvn package` and you are done; the binaries are then located in the
+`target/mapfill` folder.

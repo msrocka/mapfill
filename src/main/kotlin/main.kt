@@ -59,7 +59,14 @@ fun main(args: Array<String>) {
     }
 
     Filler(mapping, side, collector).doIt()
-
+    println("write updated mapping to ${config.mappingFile}")
+    try {
+        val file = File(config.mappingFile)
+        FlowMap.toCsv(mapping, file)
+    } catch (e : Exception) {
+        println("ERROR: failed to write mappings back to ${config.mappingFile}")
+        e.printStackTrace()
+    }
 
 }
 
